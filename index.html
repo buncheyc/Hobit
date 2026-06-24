@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html class="light" dir="rtl" lang="he">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hobit App</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Montserrat:wght@500;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <script>
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#9B7FD4",
+              "secondary": "#C4A8E8",
+              "accent": "#7EC8A4",
+              "background": "#FAF9FF",
+              "text-main": "#2D2040",
+              "error": "#E07C7C",
+              "success": "#7EC8A4",
+              "card-bg": "#FFFFFF",
+              "outline-variant": "rgba(45, 32, 64, 0.1)",
+              "tertiary": "#656100",
+              "surface-container": "#f2ecf4",
+              "surface-container-low": "#f8f1f9",
+              "surface-container-high": "#ece6ee",
+              "surface-container-highest": "#e7e0e8",
+              "on-surface-variant": "#494550",
+              "surface-variant": "#e7e0e8",
+              "on-surface": "#1d1b20",
+              "primary-container": "#8166b9",
+              "primary-fixed": "#eaddff"
+            },
+            borderRadius: {
+              "DEFAULT": "12px",
+              "lg": "12px",
+              "xl": "16px",
+              "full": "9999px"
+            },
+            spacing: {
+              "gutter": "12px",
+              "container-margin": "20px",
+              "stack-lg": "32px",
+              "base": "8px",
+              "stack-sm": "4px",
+              "stack-md": "16px",
+              "xl": "32px",
+              "sm": "8px",
+              "lg": "24px",
+              "md": "16px"
+            },
+            fontFamily: {
+              "bebas": ["Bebas Neue", "cursive"],
+              "inter": ["Inter", "sans-serif"],
+              "montserrat": ["Montserrat", "sans-serif"],
+              "display-lg": ["Bebas Neue"],
+              "headline-lg": ["Bebas Neue"],
+              "body-md": ["Inter"],
+              "label-md": ["Montserrat"]
+            }
+          },
+        },
+      }
+    </script>
+    <style>
+      .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body { 
+          background-color: #FAF9FF; 
+          color: #2D2040; 
+          font-family: 'Inter', sans-serif;
+          -webkit-tap-highlight-color: transparent; 
+      }
+      .heading-bebas { 
+          font-family: 'Bebas Neue', cursive; 
+          font-size: 34px; 
+          font-weight: bold; 
+          text-transform: uppercase;
+          line-height: 1;
+      }
+      .heading-font {
+          font-family: 'Bebas Neue', cursive;
+          letter-spacing: 0.05em;
+      }
+      .caption-font {
+          font-family: 'Montserrat', sans-serif;
+      }
+      .calorie-ring { transform: rotate(-90deg); }
+      .subtle-shadow { box-shadow: 0 4px 20px rgba(45, 32, 64, 0.05); }
+      .sport-image-container {
+          height: 120px;
+          overflow: hidden;
+          border-radius: 12px 12px 0 0;
+      }
+      .no-scrollbar::-webkit-scrollbar {
+          display: none;
+      }
+      .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+    </style>
+  </head>
+  <body class="mb-24 overflow-x-hidden">
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
