@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 
-function Nutrition({ meals, remainingCalories, progressPercent, totalCaloriesEaten, dailyGoal, handleAddMealSubmit }) {
+// הוספנו את handleDeleteMeal ל-Props למעלה
+function Nutrition({ meals, remainingCalories, progressPercent, totalCaloriesEaten, dailyGoal, handleAddMealSubmit, handleDeleteMeal }) {
   // סטייט מקומי לקומפוננטה - האם המודל הקופץ פתוח
   const [isMealModalOpen, setIsMealModalOpen] = useState(false);
   
@@ -54,12 +55,28 @@ function Nutrition({ meals, remainingCalories, progressPercent, totalCaloriesEat
         </div>
         <div className="divide-y divide-slate-100">
           {meals.map((food) => (
-            <div key={food.id} className="p-4 flex justify-between items-center">
-              <div>
-                <p className="font-medium">{food.meal_name}</p>
-                <p className="text-xs text-slate-400">חלבון: {food.protein || 0}ג׳</p>
+            <div key={food.id} className="p-4 flex justify-between items-center group">
+              <div className="flex items-center space-x-3 space-x-reverse">
+                <div>
+                  <p className="font-medium">{food.meal_name}</p>
+                  <p className="text-xs text-slate-400">חלבון: {food.protein || 0}ג׳</p>
+                </div>
               </div>
-              <span className="font-bold">{food.calories} קל׳</span>
+              <div className="flex items-center gap-4">
+                <span className="font-bold">{food.calories} קל׳</span>
+                {/* כפתור מחיקה מעוצב */}
+                <button 
+                  onClick={() => {
+                    if(confirm(`האם להסיר את הארוחה "${food.meal_name}"?`)) {
+                      handleDeleteMeal(food.id);
+                    }
+                  }}
+                  className="text-slate-400 hover:text-rose-500 p-1 rounded-lg hover:bg-rose-50 transition-colors"
+                  title="מחק ארוחה"
+                >
+                  🗑️
+                </button>
+              </div>
             </div>
           ))}
           {meals.length === 0 && (

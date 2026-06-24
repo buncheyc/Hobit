@@ -72,6 +72,22 @@ function App() {
     setWorkouts(workouts.map(w => w.id === id ? { ...w, done: !w.done } : w));
   };
 
+  // פונקציה חדשה למחיקת ארוחה מסופאבייס ומעדכון הסטייט המקומי
+  const handleDeleteMeal = async (mealId) => {
+    const { error } = await supabase
+      .from('meals')
+      .delete()
+      .eq('id', mealId);
+
+    if (error) {
+      console.error('שגיאה במחיקת הארוחה:', error);
+      alert('לא ניתן היה למחוק את הארוחה. נסי שוב.');
+    } else {
+      // מסננים החוצה את הארוחה שנמחקה ומעדכנים את הרשימה במסך
+      setMeals(meals.filter(m => m.id !== mealId));
+    }
+  };
+
   // תנאי הגנה: אם לא מחובר, מציג רק את מסך הלוגין
   if (!isLoggedIn) {
     return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
@@ -112,6 +128,7 @@ function App() {
               const { data } = await supabase.from('meals').insert([{ user_id: targetUserId, meal_name: name, calories: parseInt(calories), protein: parseInt(protein) || 0 }]).select();
               if (data) setMeals([...meals, data[0]]);
             }}
+            handleDeleteMeal={handleDeleteMeal} // העברת הפונקציה החדשה לתוך קומפוננטת התזונה
           />
         )}
         {activeTab === 'hobbies' && <Hobbies />}
