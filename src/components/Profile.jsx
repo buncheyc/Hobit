@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-function Profile({ userProfile, setUserProfile }) {
+// מוסיפים את handleLogout לתוך ה-Props כאן למעלה
+function Profile({ userProfile, setUserProfile, handleLogout }) {
   // סטייט כדי לדעת אם אנחנו במצב עריכה
   const [isEditing, setIsEditing] = useState(false);
   
@@ -81,7 +82,7 @@ function Profile({ userProfile, setUserProfile }) {
       </section>
 
       {/* כפתורי פעולה */}
-      <div className="pt-2">
+      <div className="space-y-3 pt-2">
         {isEditing ? (
           <div className="flex gap-3">
             <button 
@@ -103,13 +104,28 @@ function Profile({ userProfile, setUserProfile }) {
             </button>
           </div>
         ) : (
-          <button 
-            onClick={() => setIsEditing(true)}
-            className="w-full bg-slate-900 text-white p-3 rounded-xl font-bold text-sm hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"
-          >
-            <span className="material-symbols-outlined text-sm">edit</span>
-            <span>ערוך פרופיל</span>
-          </button>
+          <>
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="w-full bg-slate-900 text-white p-3 rounded-xl font-bold text-sm hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-sm">edit</span>
+              <span>ערוך פרופיל</span>
+            </button>
+
+            {/* כפתור התנתק החדש שלנו - מוצג רק כשלא נמצאים במצב עריכה */}
+            <button 
+              onClick={() => {
+                if (confirm('האם את בטוחה שברצונך להתנתק מהמערכת?')) {
+                  handleLogout();
+                }
+              }}
+              className="w-full bg-rose-50 text-rose-600 border border-rose-100 p-3 rounded-xl font-bold text-sm hover:bg-rose-100 active:scale-95 transition-all flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-base">logout</span>
+              <span>התנתק מהחשבון</span>
+            </button>
+          </>
         )}
       </div>
     </div>

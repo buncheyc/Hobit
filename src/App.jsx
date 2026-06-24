@@ -132,9 +132,16 @@ function App() {
           />
         )}
         {activeTab === 'hobbies' && <Hobbies />}
-        {activeTab === 'profile' && (
-          <Profile userProfile={userProfile} setUserProfile={setUserProfile} />
-        )}
+       {activeTab === 'profile' && (
+  <Profile 
+    userProfile={userProfile} 
+    setUserProfile={setUserProfile} 
+    handleLogout={() => {
+      setIsLoggedIn(false);     // מחזיר למסך הלוגין
+      setActiveTab('home');     // מאפס את הטאב לבית לפעם הבאה שנתחבר
+    }} 
+  />
+)}
       </main>
 
       {/* תפריט ניווט תחתון קבוע */}
