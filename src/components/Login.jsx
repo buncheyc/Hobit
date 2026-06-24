@@ -14,19 +14,18 @@ function Login({ onLoginSuccess }) {
     }
   };
 
-  return (
+  return (  
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6 animate-fadeIn">
       <div className="w-full max-w-sm bg-white rounded-2xl border border-slate-200 shadow-xl p-8 space-y-6">
         
-        {/* לוגו ואנימציה */}
+       {/* לוגו ואנימציה */}
         <div className="text-center space-y-2">
           <div className="w-16 h-16 rounded-full bg-primary/10 mx-auto flex items-center justify-center text-primary shadow-inner animate-pulse">
             <span className="material-symbols-outlined text-4xl" style={{ fontVariationSettings: "'FILL' 1" }}>bolt</span>
           </div>
           <h1 className="text-4xl font-black tracking-wider text-primary heading-font">HOBIT</h1>
-          <p className="text-sm text-slate-500 font-medium">ברוך הבא! אנא התחבר כדי להמשיך</p>
+          <p className="text-base text-purple-600 font-bold tracking-wide">ברוכים הבאים ל-HOBIT! הדרך שלך לאורח חיים בריא</p>
         </div>
-
         {/* טופס התחברות */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
