@@ -2,35 +2,35 @@ import { supabase } from '../supabaseClient';
 
 export default function Upgrade() {
   const handleUpgrade = async () => {
-    const { data: { user } } = await supabase.auth.getUser();
     const { data: { session } } = await supabase.auth.getSession();
 
     const response = await fetch(
       'https://oflewxmijybjboyqpbgj.supabase.co/functions/v1/bright-handler',
       {
         method: 'POST',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.access_token}`,
+          'Authorization': `Bearer ${session?.access_token ?? ''}`,
+          'apikey': import.meta.env.VITE_SUPABASE_ANON_KEY,
         },
         body: JSON.stringify({
           priceId: import.meta.env.VITE_STRIPE_PRICE_ID,
-          userId: user?.id,
+          userId: session?.user?.id ?? 'guest',
         }),
       }
     );
 
-    const { url } = await response.json();
-    if (url) {
-      window.location.href = url;
+    const data = await response.json();
+    if (data.url) {
+      window.location.href = data.url;
     } else {
-      alert('שגיאה בחיבור לתשלום, נסי שוב');
+      alert('Error: ' + (data.error ?? 'Please try again'));
     }
   };
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-white">
-      <h1 className="text-3xl font-extrabold text-slate-900 mb-4 block" style={{ color: '#0f172a' }}>
+      <h1 className="text-3xl font-extrabold text-slate-900 mb-4" style={{ color: '#0f172a' }}>
         שדרגי ל-HOBIT Premium 🚀
       </h1>
       <p className="text-gray-500 mb-8">גישה בלתי מוגבלת לכל הפיצ'רים</p>
