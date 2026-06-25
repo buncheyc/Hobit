@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-// מוסיפים את handleLogout לתוך ה-Props כאן למעלה
-function Profile({ userProfile, setUserProfile, handleLogout }) {
+// מוסיפים את setActiveTab לתוך ה-Props כאן למעלה כדי לאפשר מעבר מסך
+function Profile({ userProfile, setUserProfile, handleLogout, setActiveTab }) {
   // סטייט כדי לדעת אם אנחנו במצב עריכה
   const [isEditing, setIsEditing] = useState(false);
   
@@ -105,6 +105,15 @@ function Profile({ userProfile, setUserProfile, handleLogout }) {
           </div>
         ) : (
           <>
+            {/* ⚡ כפתור שדרוג ל-Premium החדש והמעוצב שלך! */}
+            <button 
+              onClick={() => setActiveTab('upgrade')}
+              className="w-full bg-purple-600 text-white p-3 rounded-xl font-bold text-sm hover:bg-purple-700 active:scale-95 transition-all shadow-md shadow-purple-200 flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-base">bolt</span>
+              <span>שדרוג ל-HOBIT Premium</span>
+            </button>
+
             <button 
               onClick={() => setIsEditing(true)}
               className="w-full bg-slate-900 text-white p-3 rounded-xl font-bold text-sm hover:bg-slate-800 active:scale-95 transition-all shadow-sm flex items-center justify-center gap-2"

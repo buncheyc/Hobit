@@ -84,7 +84,6 @@ function App() {
       console.error('שגיאה במחיקת הארוחה:', error);
       alert('לא ניתן היה למחוק את הארוחה. נסי שוב.');
     } else {
-      // מסננים החוצה את הארוחה שנמחקה ומעדכנים את הרשימה במסך
       setMeals(meals.filter(m => m.id !== mealId));
     }
   };
@@ -129,21 +128,22 @@ function App() {
               const { data } = await supabase.from('meals').insert([{ user_id: targetUserId, meal_name: name, calories: parseInt(calories), protein: parseInt(protein) || 0 }]).select();
               if (data) setMeals([...meals, data[0]]);
             }}
-            handleDeleteMeal={handleDeleteMeal} // העברת הפונקציה החדשה לתוך קומפוננטת התזונה
+            handleDeleteMeal={handleDeleteMeal}
           />
         )}
         {activeTab === 'hobbies' && <Hobbies />}
-       {activeTab === 'profile' && (
-  <Profile 
-    userProfile={userProfile} 
-    setUserProfile={setUserProfile} 
-    handleLogout={() => {
-      setIsLoggedIn(false);     // מחזיר למסך הלוגין
-      setActiveTab('home');     // מאפס את הטאב לבית לפעם הבאה שנתחבר
-    }} 
-  />
-)}
-{activeTab === 'upgrade' && <Upgrade />}
+        {activeTab === 'profile' && (
+          <Profile 
+            userProfile={userProfile} 
+            setUserProfile={setUserProfile} 
+            setActiveTab={setActiveTab} // 👈 פותר את הבעיה: מעביר את היכולת לשנות טאב למסך הפרופיל
+            handleLogout={() => {
+              setIsLoggedIn(false);     
+              setActiveTab('home');     
+            }} 
+          />
+        )}
+        {activeTab === 'upgrade' && <Upgrade />}
       </main>
 
       {/* תפריט ניווט תחתון קבוע */}
