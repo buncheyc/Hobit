@@ -6,7 +6,6 @@ import Home from './components/Home';
 import Hobbies from './components/Hobbies';
 import Profile from './components/Profile';
 import Login from './components/Login';
-import HobiAgent from './components/HobiAgent';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home'); 
@@ -164,7 +163,6 @@ function App() {
           <span className="text-[10px]">יומן</span>
         </button>
       </nav>
-<HobiAgent />
     </div>
   );
 }
