@@ -19,7 +19,6 @@ function Login({ onLoginSuccess }) {
       if (error) {
         setError(error.message);
       } else {
-        // יצירת פרופיל אוטומטית למשתמש חדש
         await supabase.from('profiles').insert([{
           user_id: data.user.id,
           full_name: fullName,
@@ -36,6 +35,21 @@ function Login({ onLoginSuccess }) {
       } else {
         onLoginSuccess(data.user);
       }
+    }
+    setLoading(false);
+  };
+
+  const handleDemoLogin = async () => {
+    setLoading(true);
+    setError('');
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: 'test@hobit.com',
+      password: '123456'
+    });
+    if (error) {
+      setError('שגיאה בכניסת דמו');
+    } else {
+      onLoginSuccess(data.user);
     }
     setLoading(false);
   };
@@ -110,6 +124,16 @@ function Login({ onLoginSuccess }) {
             {loading ? 'טוען...' : isRegister ? 'הירשם' : 'התחבר'}
           </button>
         </form>
+
+        {!isRegister && (
+          <button
+            onClick={handleDemoLogin}
+            disabled={loading}
+            className="w-full bg-slate-100 text-slate-600 p-4 rounded-2xl font-bold text-sm hover:bg-slate-200 active:scale-[0.98] transition-all"
+          >
+            🎯 כניסה מהירה לדמו
+          </button>
+        )}
 
         <div className="text-center pt-2">
           {isRegister ? (
