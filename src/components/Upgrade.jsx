@@ -1,18 +1,25 @@
-import { loadStripe } from '@stripe/stripe-js';
-
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+import { supabase } from '../supabaseClient';
 
 export default function Upgrade() {
   const handleUpgrade = async () => {
-    const stripe = await stripePromise;
-    await stripe.redirectToCheckout({
-      lineItems: [{ price: import.meta.env.VITE_STRIPE_PRICE_ID, quantity: 1 }],
-      mode: 'subscription',
-      successUrl: window.location.origin + '/profile?upgraded=true',
-      cancelUrl: window.location.origin + '/upgrade',
-    });
-  };
+    const { data: { user } } = await supabase.auth.getUser();
 
+    const response = await fetch(
+      'https://oflewxmijybjboyqpbgj.supabase.co/functions/v1/bright-handler',
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          priceId: import.meta.env.VITE_STRIPE_PRICE_ID,
+          userId: user?.id,
+        }),
+      }
+    );
+
+    const { url } = await response.json();
+    window.location.href = url;
+  };
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-white">
       {/* 🛠️ שינינו את ה-Class ל-text-slate-900 כדי שהכותרת תהיה שחורה וברורה לחלוטין */}
