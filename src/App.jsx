@@ -9,98 +9,99 @@ import Login from './components/Login';
 import Upgrade from './components/Upgrade';
 
 function App() {
-  const [activeTab, setActiveTab] = useState('home'); 
+  const [activeTab, setActiveTab] = useState('home');
   const [activeFilter, setActiveFilter] = useState('הכל');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  // נתוני ברירת מחדל עד שהדאטהבייס נטען
   const [userProfile, setUserProfile] = useState({
     full_name: 'משתמש HOBIT',
     daily_calorie_goal: 2000
   });
 
- const [workouts, setWorkouts] = useState([
-    // כוח
+  const [workouts, setWorkouts] = useState([
     { id: 1, workout_type: 'אימון משקולות פלג גוף עליון', duration: 45, calories: 320, category: 'כוח', done: true },
     { id: 2, workout_type: 'אימון רגליים וישבן (Squat Day)', duration: 50, calories: 400, category: 'כוח', done: false },
     { id: 3, workout_type: 'אימון פונקציונלי קרוספיט', duration: 40, calories: 380, category: 'כוח', done: false },
-    
-    // קרדיו
     { id: 4, workout_type: 'רכיבת אופניים אירובית', duration: 30, calories: 240, category: 'קרדיו', done: false },
     { id: 5, workout_type: 'ריצת נפח קצב בינוני', duration: 50, calories: 450, category: 'קרדיו', done: false },
     { id: 6, workout_type: 'אימון קיקבוקסינג בעצימות גבוהה', duration: 45, calories: 420, category: 'קרדיו', done: true },
-    
-    // גמישות
     { id: 7, workout_type: 'אימון יוגה דינמית (Vinyasa)', duration: 60, calories: 180, category: 'גמישות', done: false },
     { id: 8, workout_type: 'פילאטיס מזרן לחיזוק הליבה', duration: 45, calories: 210, category: 'גמישות', done: false },
     { id: 9, workout_type: 'מתיחות עמוקות ושחרור שרירים', duration: 25, calories: 90, category: 'גמישות', done: true }
   ]);
   const [meals, setMeals] = useState([]);
 
-  // חישובים דינמיים לעמודי הבית והתזונה
   const totalCaloriesEaten = meals.reduce((sum, m) => sum + (parseInt(m.calories) || 0), 0);
   const dailyGoal = userProfile.daily_calorie_goal || 2000;
   const remainingCalories = dailyGoal - totalCaloriesEaten;
   const progressPercent = Math.min(Math.round((totalCaloriesEaten / dailyGoal) * 100), 100);
 
-  // פונקציית טעינת נתונים אמיתית מסופאבייס
+  // טעינת session קיים בפתיחת האפליקציה
   useEffect(() => {
-    async function fetchData() {
-      const targetUserId = '680a0e11-a00d-4325-92ca-a76ff0e5c7ff';
-
-      // 1. טעינת פרופיל
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', targetUserId)
-        .single();
-      
-      if (profileData) setUserProfile(profileData);
-
-      // 2. טעינת ארוחות
-      const { data: mealsData } = await supabase
-        .from('meals')
-        .select('*')
-        .eq('user_id', targetUserId);
-      
-      if (mealsData) setMeals(mealsData);
-    }
-
-    fetchData();
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setCurrentUser(session.user);
+        setIsLoggedIn(true);
+        fetchData(session.user.id);
+      }
+    });
   }, []);
+
+  const fetchData = async (userId) => {
+    const { data: profileData } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+
+    if (profileData) setUserProfile(profileData);
+
+    const { data: mealsData } = await supabase
+      .from('meals')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (mealsData) setMeals(mealsData);
+  };
+
+  const handleLoginSuccess = (user) => {
+    setCurrentUser(user);
+    setIsLoggedIn(true);
+    fetchData(user.id);
+  };
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setIsLoggedIn(false);
+    setCurrentUser(null);
+    setActiveTab('home');
+    setUserProfile({ full_name: 'משתמש HOBIT', daily_calorie_goal: 2000 });
+    setMeals([]);
+  };
 
   const toggleWorkout = (id) => {
     setWorkouts(workouts.map(w => w.id === id ? { ...w, done: !w.done } : w));
   };
 
-  // פונקציה חדשה למחיקת ארוחה מסופאבייס ומעדכון הסטייט המקומי
   const handleDeleteMeal = async (mealId) => {
-    const { error } = await supabase
-      .from('meals')
-      .delete()
-      .eq('id', mealId);
-
+    const { error } = await supabase.from('meals').delete().eq('id', mealId);
     if (error) {
-      console.error('שגיאה במחיקת הארוחה:', error);
       alert('לא ניתן היה למחוק את הארוחה. נסי שוב.');
     } else {
       setMeals(meals.filter(m => m.id !== mealId));
     }
   };
 
-  // תנאי הגנה: אם לא מחובר, מציג רק את מסך הלוגין
   if (!isLoggedIn) {
-    return <Login onLoginSuccess={() => setIsLoggedIn(true)} />;
+    return <Login onLoginSuccess={handleLoginSuccess} />;
   }
 
-  // אם מחובר, מציג את כל האפליקציה כרגיל
   return (
     <div className="min-h-screen flex flex-col justify-between pb-24 relative bg-slate-50">
-      
-      {/* כותרת עליונה */}
       <header className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
         <h1 className="text-xl font-black tracking-wider text-primary">HOBIT</h1>
-        <button 
+        <button
           onClick={() => setActiveTab('profile')}
           className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
         >
@@ -108,7 +109,6 @@ function App() {
         </button>
       </header>
 
-      {/* אזור התוכן המרכזי שמציג קומפוננטה לפי הטאב הנבחר */}
       <main className="px-4 max-w-2xl mx-auto pt-6 flex-1 w-full">
         {activeTab === 'home' && (
           <Home userProfile={userProfile} totalCaloriesEaten={totalCaloriesEaten} workouts={workouts} setActiveTab={setActiveTab} />
@@ -117,15 +117,19 @@ function App() {
           <Workouts workouts={workouts} toggleWorkout={toggleWorkout} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
         )}
         {activeTab === 'nutrition' && (
-          <Nutrition 
-            meals={meals} 
-            remainingCalories={remainingCalories} 
-            progressPercent={progressPercent} 
-            totalCaloriesEaten={totalCaloriesEaten} 
-            dailyGoal={dailyGoal} 
+          <Nutrition
+            meals={meals}
+            remainingCalories={remainingCalories}
+            progressPercent={progressPercent}
+            totalCaloriesEaten={totalCaloriesEaten}
+            dailyGoal={dailyGoal}
             handleAddMealSubmit={async (name, calories, protein) => {
-              const targetUserId = '680a0e11-a00d-4325-92ca-a76ff0e5c7ff';
-              const { data } = await supabase.from('meals').insert([{ user_id: targetUserId, meal_name: name, calories: parseInt(calories), protein: parseInt(protein) || 0 }]).select();
+              const { data } = await supabase.from('meals').insert([{
+                user_id: currentUser.id,
+                meal_name: name,
+                calories: parseInt(calories),
+                protein: parseInt(protein) || 0
+              }]).select();
               if (data) setMeals([...meals, data[0]]);
             }}
             handleDeleteMeal={handleDeleteMeal}
@@ -133,20 +137,17 @@ function App() {
         )}
         {activeTab === 'hobbies' && <Hobbies />}
         {activeTab === 'profile' && (
-          <Profile 
-            userProfile={userProfile} 
-            setUserProfile={setUserProfile} 
-            setActiveTab={setActiveTab} // 👈 פותר את הבעיה: מעביר את היכולת לשנות טאב למסך הפרופיל
-            handleLogout={() => {
-              setIsLoggedIn(false);     
-              setActiveTab('home');     
-            }} 
+          <Profile
+            userProfile={userProfile}
+            setUserProfile={setUserProfile}
+            setActiveTab={setActiveTab}
+            currentUser={currentUser}
+            handleLogout={handleLogout}
           />
         )}
         {activeTab === 'upgrade' && <Upgrade />}
       </main>
 
-      {/* תפריט ניווט תחתון קבוע */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-6 py-2 z-40 flex justify-between items-center max-w-2xl mx-auto">
         <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'home' ? 'text-primary font-bold' : 'text-slate-400'}`}>
           <span className="material-symbols-outlined">home</span>

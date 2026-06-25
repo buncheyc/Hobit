@@ -1,50 +1,56 @@
 import React, { useState } from 'react';
+import { supabase } from '../supabaseClient';
 
 function Login({ onLoginSuccess }) {
-  // state לניהול המסך הנוכחי: 'login' או 'register'
   const [isRegister, setIsRegister] = useState(false);
-  
-  // שדות הטופס
   const [fullName, setFullName] = useState('');
-  const [email, setEmail] = useState('demo@hobit.com');
-  const [password, setPassword] = useState('123456');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    
+    setLoading(true);
+    setError('');
+
     if (isRegister) {
-      if (fullName && email && password) {
-        alert('ההרשמה בוצעה בהצלחה! מעביר אותך לאפליקציה...');
-        onLoginSuccess();
+      const { data, error } = await supabase.auth.signUp({ email, password });
+      if (error) {
+        setError(error.message);
       } else {
-        alert('נא למלא את כל השדות!');
+        // יצירת פרופיל אוטומטית למשתמש חדש
+        await supabase.from('profiles').insert([{
+          user_id: data.user.id,
+          full_name: fullName,
+          daily_calorie_goal: 2000,
+          daily_step_goal: 10000,
+          weekly_workout_goal: 3,
+        }]);
+        onLoginSuccess(data.user);
       }
     } else {
-      if (email && password) {
-        onLoginSuccess();
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        setError('אימייל או סיסמה שגויים');
       } else {
-        alert('נא למלא אימייל וסיסמה!');
+        onLoginSuccess(data.user);
       }
     }
+    setLoading(false);
   };
 
-  return (  
+  return (
     <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6 animate-fadeIn">
-      
-      {/* כרטיסיית הטופס המרכזית */}
       <div className="w-full max-w-sm bg-white rounded-[28px] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 space-y-6">
         
-        {/* הלוגו והמילה בצבע המותג המקורי שלך (text-primary) */}
         <div className="flex flex-col items-center justify-center text-center space-y-1">
           <span className="material-symbols-outlined text-4xl text-primary animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>
             bolt
           </span>
-          <h2 className="text-4xl font-black tracking-wider text-primary heading-font">
-            HOBIT
-          </h2>
+          <h2 className="text-4xl font-black tracking-wider text-primary heading-font">HOBIT</h2>
         </div>
 
-        {/* כותרת פנימית קלילה */}
         <div className="text-center space-y-2 pt-2 border-t border-slate-50">
           <h1 className="text-2xl font-black text-slate-800 tracking-tight">
             {isRegister ? 'הרשמה' : 'התחברות'}
@@ -54,15 +60,18 @@ function Login({ onLoginSuccess }) {
           </p>
         </div>
 
-        {/* טופס */}
+        {error && (
+          <div className="bg-rose-50 text-rose-600 text-sm p-3 rounded-xl text-center font-medium">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-5">
-          
-          {/* שדה שם מלא - יוצג רק במצב הרשמה */}
           {isRegister && (
             <div className="space-y-1.5">
               <label className="block text-xs font-bold text-slate-700 mr-1">שם מלא</label>
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="הכנס שם מלא"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
@@ -73,8 +82,8 @@ function Login({ onLoginSuccess }) {
 
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-slate-700 mr-1">אימייל</label>
-            <input 
-              type="email" 
+            <input
+              type="email"
               placeholder="הכנס אימייל"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -84,42 +93,35 @@ function Login({ onLoginSuccess }) {
 
           <div className="space-y-1.5">
             <label className="block text-xs font-bold text-slate-700 mr-1">סיסמה</label>
-            <input 
-              type="password" 
-              placeholder={isRegister ? "בחר סיסמה" : "הכנס סיסמה"}
+            <input
+              type="password"
+              placeholder={isRegister ? 'בחר סיסמה' : 'הכנס סיסמה'}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full border border-slate-200 rounded-2xl p-4 text-sm outline-none transition-all focus:border-purple-500 bg-white placeholder-slate-400 font-medium text-right"
             />
           </div>
 
-          <button 
+          <button
             type="submit"
+            disabled={loading}
             className="w-full bg-purple-600 text-white p-4 rounded-2xl font-black text-base hover:bg-purple-700 active:scale-[0.98] transition-all shadow-lg shadow-purple-600/10 mt-2"
           >
-            {isRegister ? 'הירשם' : 'התחבר'}
+            {loading ? 'טוען...' : isRegister ? 'הירשם' : 'התחבר'}
           </button>
         </form>
 
-        {/* קישור החלפה בתחתית */}
         <div className="text-center pt-2">
           {isRegister ? (
-            <p 
-              onClick={() => setIsRegister(false)} 
-              className="text-xs font-bold text-purple-600 cursor-pointer hover:underline"
-            >
+            <p onClick={() => setIsRegister(false)} className="text-xs font-bold text-purple-600 cursor-pointer hover:underline">
               כבר יש לכם חשבון? התחברו כאן
             </p>
           ) : (
-            <p 
-              onClick={() => setIsRegister(true)} 
-              className="text-xs font-bold text-purple-600 cursor-pointer hover:underline"
-            >
+            <p onClick={() => setIsRegister(true)} className="text-xs font-bold text-purple-600 cursor-pointer hover:underline">
               עדיין אין לכם חשבון? הירשמו כאן
             </p>
           )}
         </div>
-
       </div>
     </div>
   );

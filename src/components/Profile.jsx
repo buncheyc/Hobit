@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 
-function Profile({ userProfile, setUserProfile, handleLogout, setActiveTab }) {
+function Profile({ userProfile, setUserProfile, handleLogout, setActiveTab,currentUser }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editName, setEditName] = useState(userProfile.full_name);
   const [editGoal, setEditGoal] = useState(userProfile.daily_calorie_goal);
@@ -13,7 +13,7 @@ function Profile({ userProfile, setUserProfile, handleLogout, setActiveTab }) {
 
   const handleSave = async () => {
     setIsSaving(true);
-    const targetUserId = '680a0e11-a00d-4325-92ca-a76ff0e5c7ff';
+const targetUserId = currentUser?.id;
 
     const { error } = await supabase
       .from('profiles')
