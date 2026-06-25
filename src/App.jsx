@@ -6,6 +6,7 @@ import Home from './components/Home';
 import Hobbies from './components/Hobbies';
 import Profile from './components/Profile';
 import Login from './components/Login';
+import Upgrade from './components/Upgrade';
 
 function App() {
   const [activeTab, setActiveTab] = useState('home'); 
@@ -142,6 +143,7 @@ function App() {
     }} 
   />
 )}
+{activeTab === 'upgrade' && <Upgrade />}
       </main>
 
       {/* תפריט ניווט תחתון קבוע */}
