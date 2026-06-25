@@ -1,173 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from './supabaseClient';
-import Nutrition from './components/Nutrition';
-import Workouts from './components/Workouts';
-import Home from './components/Home';
-import Hobbies from './components/Hobbies';
-import Profile from './components/Profile';
-import Login from './components/Login';
-import Upgrade from './components/Upgrade';
+import React, { useState } from 'react';
 
-function App() {
-  const [activeTab, setActiveTab] = useState('home');
-  const [activeFilter, setActiveFilter] = useState('הכל');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
+function Login({ onLoginSuccess }) {
+  // state לניהול המסך הנוכחי: 'login' או 'register'
+  const [isRegister, setIsRegister] = useState(false);
+  
+  // שדות הטופס
+  const [fullName, setFullName] = useState('');
+  const [email, setEmail] = useState('demo@hobit.com');
+  const [password, setPassword] = useState('123456');
 
-  const [userProfile, setUserProfile] = useState({
-    full_name: 'משתמש HOBIT',
-    daily_calorie_goal: 2000
-  });
-
-  const [workouts, setWorkouts] = useState([
-    { id: 1, workout_type: 'אימון משקולות פלג גוף עליון', duration: 45, calories: 320, category: 'כוח', done: true },
-    { id: 2, workout_type: 'אימון רגליים וישבן (Squat Day)', duration: 50, calories: 400, category: 'כוח', done: false },
-    { id: 3, workout_type: 'אימון פונקציונלי קרוספיט', duration: 40, calories: 380, category: 'כוח', done: false },
-    { id: 4, workout_type: 'רכיבת אופניים אירובית', duration: 30, calories: 240, category: 'קרדיו', done: false },
-    { id: 5, workout_type: 'ריצת נפח קצב בינוני', duration: 50, calories: 450, category: 'קרדיו', done: false },
-    { id: 6, workout_type: 'אימון קיקבוקסינג בעצימות גבוהה', duration: 45, calories: 420, category: 'קרדיו', done: true },
-    { id: 7, workout_type: 'אימון יוגה דינמית (Vinyasa)', duration: 60, calories: 180, category: 'גמישות', done: false },
-    { id: 8, workout_type: 'פילאטיס מזרן לחיזוק הליבה', duration: 45, calories: 210, category: 'גמישות', done: false },
-    { id: 9, workout_type: 'מתיחות עמוקות ושחרור שרירים', duration: 25, calories: 90, category: 'גמישות', done: true }
-  ]);
-  const [meals, setMeals] = useState([]);
-
-  const totalCaloriesEaten = meals.reduce((sum, m) => sum + (parseInt(m.calories) || 0), 0);
-  const dailyGoal = userProfile.daily_calorie_goal || 2000;
-  const remainingCalories = dailyGoal - totalCaloriesEaten;
-  const progressPercent = Math.min(Math.round((totalCaloriesEaten / dailyGoal) * 100), 100);
-
-  // טעינת session קיים בפתיחת האפליקציה
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        setCurrentUser(session.user);
-        setIsLoggedIn(true);
-        fetchData(session.user.id);
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    
+    if (isRegister) {
+      if (fullName && email && password) {
+        alert('ההרשמה בוצעה בהצלחה! מעביר אותך לאפליקציה...');
+        onLoginSuccess();
+      } else {
+        alert('נא למלא את כל השדות!');
       }
-    });
-  }, []);
-
-  const fetchData = async (userId) => {
-    const { data: profileData } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('user_id', userId)
-      .single();
-
-    if (profileData) setUserProfile(profileData);
-
-    const { data: mealsData } = await supabase
-      .from('meals')
-      .select('*')
-      .eq('user_id', userId);
-
-    if (mealsData) setMeals(mealsData);
-  };
-
-  const handleLoginSuccess = (user) => {
-    setCurrentUser(user);
-    setIsLoggedIn(true);
-    fetchData(user.id);
-  };
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setIsLoggedIn(false);
-    setCurrentUser(null);
-    setActiveTab('home');
-    setUserProfile({ full_name: 'משתמש HOBIT', daily_calorie_goal: 2000 });
-    setMeals([]);
-  };
-
-  const toggleWorkout = (id) => {
-    setWorkouts(workouts.map(w => w.id === id ? { ...w, done: !w.done } : w));
-  };
-
-  const handleDeleteMeal = async (mealId) => {
-    const { error } = await supabase.from('meals').delete().eq('id', mealId);
-    if (error) {
-      alert('לא ניתן היה למחוק את הארוחה. נסי שוב.');
     } else {
-      setMeals(meals.filter(m => m.id !== mealId));
+      if (email && password) {
+        onLoginSuccess();
+      } else {
+        alert('נא למלא אימייל וסיסמה!');
+      }
     }
   };
 
-  if (!isLoggedIn) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
-  }
+  return (  
+    <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-6 animate-fadeIn">
+      
+      {/* כרטיסיית הטופס המרכזית */}
+      <div className="w-full max-w-sm bg-white rounded-[28px] border border-slate-100 shadow-xl shadow-slate-200/50 p-10 space-y-6">
+        
+        {/* הלוגו והמילה בצבע המותג המקורי שלך (text-primary) */}
+        <div className="flex flex-col items-center justify-center text-center space-y-1">
+          <span className="material-symbols-outlined text-4xl text-primary animate-pulse" style={{ fontVariationSettings: "'FILL' 1" }}>
+            bolt
+          </span>
+          <h2 className="text-4xl font-black tracking-wider text-primary heading-font">
+            HOBIT
+          </h2>
+        </div>
 
-  return (
-    <div className="min-h-screen flex flex-col justify-between pb-24 relative bg-slate-50">
-      <header className="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-black tracking-wider text-primary">HOBIT</h1>
-        <button
-          onClick={() => setActiveTab('profile')}
-          className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary"
-        >
-          <span className="material-symbols-outlined text-xl">person</span>
-        </button>
-      </header>
+        {/* כותרת פנימית קלילה */}
+        <div className="text-center space-y-2 pt-2 border-t border-slate-50">
+          <h1 className="text-2xl font-black text-slate-800 tracking-tight">
+            {isRegister ? 'הרשמה' : 'התחברות'}
+          </h1>
+          <p className="text-sm text-slate-400 font-medium leading-relaxed max-w-[240px] mx-auto">
+            {isRegister ? 'הצטרפו אלינו והתחילו את המסע שלכם.' : 'ברוכים השבים! אנא הזינו את פרטי ההתחברות.'}
+          </p>
+        </div>
 
-      <main className="px-4 max-w-2xl mx-auto pt-6 flex-1 w-full">
-        {activeTab === 'home' && (
-          <Home userProfile={userProfile} totalCaloriesEaten={totalCaloriesEaten} workouts={workouts} setActiveTab={setActiveTab} />
-        )}
-        {activeTab === 'workouts' && (
-          <Workouts workouts={workouts} toggleWorkout={toggleWorkout} activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
-        )}
-        {activeTab === 'nutrition' && (
-          <Nutrition
-            meals={meals}
-            remainingCalories={remainingCalories}
-            progressPercent={progressPercent}
-            totalCaloriesEaten={totalCaloriesEaten}
-            dailyGoal={dailyGoal}
-            handleAddMealSubmit={async (name, calories, protein) => {
-              const { data } = await supabase.from('meals').insert([{
-                user_id: currentUser.id,
-                meal_name: name,
-                calories: parseInt(calories),
-                protein: parseInt(protein) || 0
-              }]).select();
-              if (data) setMeals([...meals, data[0]]);
-            }}
-            handleDeleteMeal={handleDeleteMeal}
-          />
-        )}
-        {activeTab === 'hobbies' && <Hobbies />}
-        {activeTab === 'profile' && (
-          <Profile
-            userProfile={userProfile}
-            setUserProfile={setUserProfile}
-            setActiveTab={setActiveTab}
-            currentUser={currentUser}
-            handleLogout={handleLogout}
-          />
-        )}
-        {activeTab === 'upgrade' && <Upgrade />}
-      </main>
+        {/* טופס */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          
+          {/* שדה שם מלא - יוצג רק במצב הרשמה */}
+          {isRegister && (
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold text-slate-700 mr-1">שם מלא</label>
+              <input 
+                type="text" 
+                placeholder="הכנס שם מלא"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className="w-full border border-slate-200 rounded-2xl p-4 text-sm outline-none transition-all focus:border-purple-500 bg-white placeholder-slate-400 font-medium text-right"
+              />
+            </div>
+          )}
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-6 py-2 z-40 flex justify-between items-center max-w-2xl mx-auto">
-        <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'home' ? 'text-primary font-bold' : 'text-slate-400'}`}>
-          <span className="material-symbols-outlined">home</span>
-          <span className="text-[10px]">בית</span>
-        </button>
-        <button onClick={() => setActiveTab('workouts')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'workouts' ? 'text-primary font-bold' : 'text-slate-400'}`}>
-          <span className="material-symbols-outlined">fitness_center</span>
-          <span className="text-[10px]">אימונים</span>
-        </button>
-        <button onClick={() => setActiveTab('nutrition')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'nutrition' ? 'text-primary font-bold' : 'text-slate-400'}`}>
-          <span className="material-symbols-outlined">restaurant</span>
-          <span className="text-[10px]">תזונה</span>
-        </button>
-        <button onClick={() => setActiveTab('hobbies')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'hobbies' ? 'text-primary font-bold' : 'text-slate-400'}`}>
-          <span className="material-symbols-outlined">sports_tennis</span>
-          <span className="text-[10px]">יומן</span>
-        </button>
-      </nav>
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700 mr-1">אימייל</label>
+            <input 
+              type="email" 
+              placeholder="הכנס אימייל"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full border border-slate-200 rounded-2xl p-4 text-sm outline-none transition-all focus:border-purple-500 bg-white placeholder-slate-400 font-medium text-right"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="block text-xs font-bold text-slate-700 mr-1">סיסמה</label>
+            <input 
+              type="password" 
+              placeholder={isRegister ? "בחר סיסמה" : "הכנס סיסמה"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border border-slate-200 rounded-2xl p-4 text-sm outline-none transition-all focus:border-purple-500 bg-white placeholder-slate-400 font-medium text-right"
+            />
+          </div>
+
+          <button 
+            type="submit"
+            className="w-full bg-purple-600 text-white p-4 rounded-2xl font-black text-base hover:bg-purple-700 active:scale-[0.98] transition-all shadow-lg shadow-purple-600/10 mt-2"
+          >
+            {isRegister ? 'הירשם' : 'התחבר'}
+          </button>
+        </form>
+
+        {/* קישור החלפה בתחתית */}
+        <div className="text-center pt-2">
+          {isRegister ? (
+            <p 
+              onClick={() => setIsRegister(false)} 
+              className="text-xs font-bold text-purple-600 cursor-pointer hover:underline"
+            >
+              כבר יש לכם חשבון? התחברו כאן
+            </p>
+          ) : (
+            <p 
+              onClick={() => setIsRegister(true)} 
+              className="text-xs font-bold text-purple-600 cursor-pointer hover:underline"
+            >
+              עדיין אין לכם חשבון? הירשמו כאן
+            </p>
+          )}
+        </div>
+
+      </div>
     </div>
   );
 }
 
-export default App;
+export default Login;
