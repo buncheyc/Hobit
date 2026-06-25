@@ -3,12 +3,16 @@ import { supabase } from '../supabaseClient';
 export default function Upgrade() {
   const handleUpgrade = async () => {
     const { data: { user } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
 
     const response = await fetch(
       'https://oflewxmijybjboyqpbgj.supabase.co/functions/v1/bright-handler',
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.access_token}`,
+        },
         body: JSON.stringify({
           priceId: import.meta.env.VITE_STRIPE_PRICE_ID,
           userId: user?.id,
@@ -17,12 +21,15 @@ export default function Upgrade() {
     );
 
     const { url } = await response.json();
-    window.location.href = url;
+    if (url) {
+      window.location.href = url;
+    } else {
+      alert('שגיאה בחיבור לתשלום, נסי שוב');
+    }
   };
-  
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen p-6 bg-white">
-      {/* 🛠️ שינינו את ה-Class ל-text-slate-900 כדי שהכותרת תהיה שחורה וברורה לחלוטין */}
       <h1 className="text-3xl font-extrabold text-slate-900 mb-4 block" style={{ color: '#0f172a' }}>
         שדרגי ל-HOBIT Premium 🚀
       </h1>
