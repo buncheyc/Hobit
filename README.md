@@ -35,51 +35,10 @@
 
 ![Supabase ERD Diagram](https://github.com/buncheyc/Hobit/raw/main/erd.png)
 
- תרשים ERD — מודל הנתונים (Supabase)
+## 3. תרשים ERD — מודל הנתונים (Supabase)
+![Supabase ERD Diagram](erd.png)
 
-להלן מודל ישויות-קשרים (ERD) המציג את ארכיטקטורת מסד הנתונים, סוגי הנתונים והקשרים הלוגיים בין הישויות במערכת:
-
-```mermaid
-erDiagram
-    auth_users {
-        uuid id PK
-        string email
-    }
-
-    profiles {
-        uuid id PK
-        uuid user_id FK
-        string full_name
-        string avatar_url
-        float weight
-        int height
-        int daily_step_goal
-        int daily_calorie_goal
-        timestamp created_at
-    }
-
-    meals {
-        uuid id PK
-        uuid user_id FK
-        string meal_name
-        int calories
-        float protein
-        timestamp created_at
-    }
-
-    workouts {
-        uuid id PK
-        uuid user_id FK
-        string workout_type
-        int duration
-        int calories
-        timestamp created_at
-    }
-
-    auth_users ||--|| profiles : "has_one"
-    auth_users ||--o{ meals : "logs_many"
-    auth_users ||--o{ workouts : "tracks_many"
-
+*(במידה והתמונה לא נטענת ישירות, ניתן לפתוח את הקובץ [erd.png](erd.png) ישירות מתוך תיקיית השורש של הפרויקט).*
 ---
 
 ## 4. רשימת שירותים חיצוניים ואינטגרציות
