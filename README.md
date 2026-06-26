@@ -28,13 +28,6 @@
 * **סיסמה לבדיקה:** `123456`
 *(ניתן ללחוץ ישירות על כפתור התחבר במסך הראשי כדי להיכנס למערכת).*
 
----
-
-## 3. תרשים ERD — מודל הנתונים (Supabase)
-![alt text](erd.png)להלן תרשים הישויות-קשרים (ERD) המציג את מבנה הטבלאות, העמודות, הטיפוסים, המפתחות הראשיים והזרים (Primary / Foreign Keys) והקשרים ביניהן כפי שהופק מתוך ה-Schema Visualizer ב-Supabase:
-
-![Supabase ERD Diagram](https://github.com/buncheyc/Hobit/raw/main/erd.png)
-
 ## 3. תרשים ERD — מודל הנתונים (Supabase)
 ![Supabase ERD Diagram](erd.png)
 
