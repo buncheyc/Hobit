@@ -11,8 +11,9 @@ import Upgrade from './components/Upgrade';
 function App() {
   const [activeTab, setActiveTab] = useState('home'); 
   const [activeFilter, setActiveFilter] = useState('הכל');
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-
+const [isLoggedIn, setIsLoggedIn] = useState(() => {
+  return localStorage.getItem('hobit_is_logged_in') === 'true';
+});
   const [userProfile, setUserProfile] = useState({
     full_name: 'משתמש HOBIT',
     daily_calorie_goal: 2000

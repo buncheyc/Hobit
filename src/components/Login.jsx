@@ -15,12 +15,16 @@ function Login({ onLoginSuccess }) {
     if (isRegister) {
       if (fullName && email && password) {
         alert('ההרשמה בוצעה בהצלחה! מעביר אותך לאפליקציה...');
+        // שומר בזיכרון המקומי שהמשתמש מחובר
+        localStorage.setItem('hobit_is_logged_in', 'true');
         onLoginSuccess();
       } else {
         alert('נא למלא את כל השדות!');
       }
     } else {
       if (email && password) {
+        // שומר בזיכרון המקומי שהמשתמש מחובר
+        localStorage.setItem('hobit_is_logged_in', 'true');
         onLoginSuccess();
       } else {
         alert('נא למלא אימייל וסיסמה!');
