@@ -127,8 +127,7 @@ function App() {
             }} 
           />
         )}
-        {activeTab === 'upgrade' && <Upgrade />}
-      </main>
+{activeTab === 'upgrade' && <Upgrade onClose={() => setActiveTab('home')} />}      </main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-md border-t border-slate-100 px-6 py-2 z-40 flex justify-between items-center max-w-2xl mx-auto">
         <button onClick={() => setActiveTab('home')} className={`flex flex-col items-center gap-1 p-2 ${activeTab === 'home' ? 'text-primary font-bold' : 'text-slate-400'}`}>
